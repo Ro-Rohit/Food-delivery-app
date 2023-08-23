@@ -1,6 +1,7 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../Routes/app_routes.dart';
 import '../../widgets/custom_snackbar.dart';
 
 class AuthRepo extends GetxService{
@@ -23,6 +24,31 @@ class AuthRepo extends GetxService{
 
     return credential;
   }
+
+
+
+  Future<void> sendOTP(String phoneNumber) async{
+    await auth.verifyPhoneNumber(
+        phoneNumber: "+91$phoneNumber",
+        verificationCompleted: (PhoneAuthCredential credential){},
+        verificationFailed: (error){
+          showCustomSnackBar(error.code);
+        },
+        codeSent: (verificationId, forceResendingToken){
+          Get.offNamed(AppRoutes.getOTPVerifyPage(verificationId));
+        },
+        codeAutoRetrievalTimeout: (verificationId){});
+  }
+  Future<PhoneAuthCredential> verifyOTP(String otp, String verificationId ) async{
+     PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: otp);
+     return credential;
+  }
+  Future<UserCredential> signInWithPhoneCredential(PhoneAuthCredential credential) async{
+    return await auth.signInWithCredential(credential);
+  }
+
 
   Future<AuthCredential?> googleSignIn() async {
     final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -49,15 +75,14 @@ class AuthRepo extends GetxService{
 
 
   Future<void> verifyEmail() async{
+      await  auth.currentUser!.sendEmailVerification();
       showCustomSnackBar("An Email has been sent in your account", title: "Email Verification",
           isError: false);
-      await  auth.currentUser!.sendEmailVerification();
   }
 
 
   Future<void> updateCurrentUser() async{
     auth.currentUser!.reload();
-    print(auth.currentUser);
   }
 
   Future<void> updateEmail(String emailAddress) async{
@@ -68,16 +93,8 @@ class AuthRepo extends GetxService{
     await auth.currentUser!.updateDisplayName(name);
   }
 
-
   Future<void> signOut() async{
     await auth.signOut();
   }
-
-
-
-
-
-
-
 
 }

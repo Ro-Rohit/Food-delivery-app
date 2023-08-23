@@ -6,10 +6,10 @@ import 'package:yummy/widgets/Big_text.dart';
 void showCustomSnackBar(String message, {bool isError=true, String title="Error"}){
    Get.snackbar(title, message, 
        titleText : BigText(text: title, color: Colors.white,),
-       messageText: BigText(text: message, color: Colors.white,),
+       messageText: Text(message, style: const TextStyle(color: Colors.white,),),
        backgroundColor: isError ?Colors.red : AppColors.mainColor,
        colorText: Colors.white,
        snackPosition: SnackPosition.TOP,
-       duration: const Duration(milliseconds: 2000),
+       duration: const Duration(milliseconds: 3000),
    );
 }

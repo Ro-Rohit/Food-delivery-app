@@ -12,6 +12,8 @@ import '../Screen/recommended_food/recommended_food_detail.dart';
 import '../Screen/splash screen/splash_screen.dart';
 import '../Screen/AuthPage/email_verification.dart';
 import '../Screen/Address/pick_address.dart';
+import '../Screen/AuthPage/otp_verfication_page.dart';
+import '../Screen/AuthPage/phone_sign_in.dart';
 
 
 class AppRoutes{
@@ -19,13 +21,18 @@ class AppRoutes{
   static const String initial = '/';
   static const String bottomNavigationPage = '/bottom-navigation-page';
 
+
   static const String registrationPage = '/registration-page';
   static const String loginPage = '/login-page';
+  static const String phoneSignInPage = '/phoneSignIn-page';
   static const String emailVerifyPage = '/emailVerify-page';
+  static const String otpVerifyPage = '/otpVerify-page';
+
 
   static const String accountPage = '/account-page';
   static const String addAddressPage = '/addAddress-page';
   static const String pickAddressPage = '/pickAddress-page';
+
 
   static const String popularFood = '/popular-food';
   static const String recommendedFood = '/recommended-food';
@@ -35,9 +42,13 @@ class AppRoutes{
   static String getBottomNavigationPage() => bottomNavigationPage;
   static String getInitial() => initial;
 
+
   static String getRegistrationPage() => registrationPage;
   static String getLoginPage() => loginPage;
+  static String getPhoneSignInPage() => phoneSignInPage;
   static String getEmailVerifyPage() => emailVerifyPage;
+  static String getOTPVerifyPage(String verificationId) => '$otpVerifyPage?verificationId=$verificationId';
+
 
   static String getAccountPage() => accountPage;
   static String getAddAddressPage() => addAddressPage;
@@ -53,7 +64,14 @@ class AppRoutes{
 
     GetPage(name: registrationPage, page: ()=> const RegistrationPage(), transition: Transition.fadeIn),
     GetPage(name: loginPage, page: ()=> const LoginPage(), transition: Transition.fadeIn),
+    GetPage(name: phoneSignInPage, page: ()=> const PhoneSignInPage(), transition: Transition.fadeIn),
     GetPage(name: emailVerifyPage, page: ()=> const EmailVerificationPage(), transition: Transition.fadeIn),
+    GetPage(name: otpVerifyPage, page: (){
+      var verificationId = Get.parameters['verificationId'];
+      return  OTPVerificationPage(verificationId: verificationId?? "",);
+    }, transition: Transition.fadeIn),
+
+
 
     GetPage(name: accountPage, page: ()=> const AccountPage(), transition: Transition.fadeIn),
     GetPage(name: addAddressPage, page: ()=> const AddAddressPage(), transition: Transition.fadeIn),

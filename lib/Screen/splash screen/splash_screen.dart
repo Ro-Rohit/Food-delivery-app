@@ -27,24 +27,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     await  Get.find<RecommendedProductController>().getRecommendedProductList();
   }
 
-  void  navigateToScreen(){
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if(user !=null && user.emailVerified)
-      {
-        Get.find<AuthController>().getUserDataFromFireStore();
-        Get.find<LockController>().getUserAddress();
-        Get.offNamed(AppRoutes.getBottomNavigationPage());
-      }
-      else if(user !=null && !user.emailVerified){
-        Get.offNamed(AppRoutes.getEmailVerifyPage());
-      }
-      else{
-        Get.offNamed(AppRoutes.getLoginPage());
-      }
-    });
-  }
-
-
 
   @override
   void initState() {
@@ -73,6 +55,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     // TODO: implement dispose
     super.dispose();
     controller.dispose();
+
   }
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,3 @@
-
 import 'package:get/get.dart';
 import '../../Model/products_model.dart';
 import '../repository/cart_repo.dart';
@@ -120,8 +119,4 @@ void clearCartHistory(){
     cartRepo.clearCartHistory();
     update();
 }
-
-
-
-
 }

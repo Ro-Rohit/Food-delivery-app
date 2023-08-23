@@ -24,21 +24,20 @@ bool get isLoading => _isLoading;
 
 void  navigateToScreen(){
   authRepo.listenChanges().listen((User? user) {
-    if(user !=null && user.emailVerified)
+    if(user !=null && (user.emailVerified || user.phoneNumber!=null))
     {
       getUserDataFromFireStore();
       Get.find<LockController>().getUserAddress();
       Get.offNamed(AppRoutes.getBottomNavigationPage());
     }
-    else if(user !=null && !user.emailVerified){
+    else if(user !=null && !user.emailVerified && user.phoneNumber==null){
       Get.offNamed(AppRoutes.getEmailVerifyPage());
     }
     else{
-      Get.offNamed(AppRoutes.getLoginPage());
+      Get.offNamed(AppRoutes.getRegistrationPage());
     }
   });
 }
-
 
 
 Future<void> createUser(String email, String password, String name,  String phone) async{
@@ -47,6 +46,7 @@ Future<void> createUser(String email, String password, String name,  String phon
     update();
     final UserCredential userCredential = await authRepo.signUpWithEmailAndPassword(email, password);
     final User? user = userCredential.user;
+
     var userModel = UserModel(
         name: name,
         email: email,
@@ -55,6 +55,7 @@ Future<void> createUser(String email, String password, String name,  String phon
     );
     await storageRepo.saveUserDataToFireStore(userModel.toJson());
     _userData = userModel;
+
     await authRepo.verifyEmail();
   }
   on FirebaseException catch(error){
@@ -66,13 +67,6 @@ Future<void> createUser(String email, String password, String name,  String phon
   }
 
 }
-
-Future<void> getUserDataFromFireStore() async{
-  final  dataSnapshot  = await storageRepo.getUserDataFromFireStore();
-  _userData = UserModel.fromFirestore(dataSnapshot as DocumentSnapshot<Map<String, dynamic>>);
-
-}
-
 Future<void> loginUser(String email, String password) async{
   try{
 
@@ -95,6 +89,22 @@ Future<void> loginUser(String email, String password) async{
 
 }
 
+Future<void> getUserDataFromFireStore() async{
+  final  dataSnapshot  = await storageRepo.getUserDataFromFireStore();
+  _userData = UserModel.fromFirestore(dataSnapshot as DocumentSnapshot<Map<String, dynamic>>);
+
+}
+Future<void> upLoadFile(File file) async{
+  try{
+    String imgUrl = await storageRepo.uploadFileToFireBase(file);
+    await storageRepo.updateUserDataToFireStore({"img" : imgUrl});
+    await getUserDataFromFireStore();
+    update();
+  }
+  on FirebaseException catch (e){
+    showCustomSnackBar(e.code);
+  }
+}
 Future<void>signInWithGoogle() async {
 
   try {
@@ -102,7 +112,7 @@ Future<void>signInWithGoogle() async {
     final UserCredential userCredential  = await authRepo.takeCredentialToFirebase(credential!);
     final User? user = userCredential.user;
 
-
+    //save user info if its logged in first time otherwise no need
     await storageRepo.getUserDataFromFireStore().then((documentSnapshot) async {
       if(!documentSnapshot.exists){
         var userModel = UserModel(
@@ -122,13 +132,72 @@ Future<void>signInWithGoogle() async {
   }
 }
 
+
+
+// phone sign in
+Future<void>sendCodeToPhone(String phoneNumber) async {
+  try {
+    _isLoading = true;
+    update();
+    await authRepo.sendOTP(phoneNumber);
+    }
+   on FirebaseAuthException catch (e) {
+    showCustomSnackBar(e.code);
+  }
+  finally{
+    _isLoading = false;
+    update();
+  }
+
+}
+Future<void>verifyCodeAndSignIn(String otp, String verificationId) async {
+  try {
+      _isLoading = true;
+      update();
+
+    PhoneAuthCredential credential = await authRepo.verifyOTP(otp, verificationId);
+    UserCredential userCredential = await  authRepo.signInWithPhoneCredential(credential);
+    User? user = userCredential.user;
+
+    await storageRepo.getUserDataFromFireStore().then((documentSnapshot) async {
+        if(!documentSnapshot.exists){
+          var userModel = UserModel(
+              name: user?.displayName ?? "Your name",
+              email: user?.email ?? "Your email address" ,
+              phone: user?.phoneNumber ?? "phone number",
+              userAddress: null,
+              timeStamp:FieldValue.serverTimestamp().toString()
+          );
+          await storageRepo.saveUserDataToFireStore(userModel.toJson());
+        }
+      } );
+    }
+
+   on FirebaseAuthException catch (e) {
+    showCustomSnackBar(e.code);
+  }
+  finally{
+    _isLoading = false;
+    update();
+  }
+}
+
+
+
 Future<void>resendEmailVerification() async{
   try{
+    _isLoading = true;
+    update();
     await authRepo.verifyEmail();
   } on FirebaseException catch(e){
     showCustomSnackBar(e.code);
   }
+  finally{
+    _isLoading = false;
+    update();
+  }
 }
+
 
 Future<void> updateName(String name) async{
   if(name.isNotEmpty)
@@ -198,6 +267,8 @@ Future<void> updatePhone(String phone) async{
 
 }
 
+
+
 Future<void> signOut() async{
   try{
     await authRepo.signOut();
@@ -208,7 +279,6 @@ Future<void> signOut() async{
 
 
 }
-
 bool isUserExists() {
   if(FirebaseAuth.instance.currentUser ==null){
     return false;
@@ -216,18 +286,8 @@ bool isUserExists() {
   return true;
 }
 
-Future upLoadFile(File file) async{
 
-  try{
-    String imgUrl = await storageRepo.uploadFileToFireBase(file);
-    await storageRepo.updateUserDataToFireStore({"img" : imgUrl});
-    await getUserDataFromFireStore();
-    update();
-  }
-  on FirebaseException catch (e){
-    showCustomSnackBar(e.code);
-  }
 
-}
+
 
 }

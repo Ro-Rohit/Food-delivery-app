@@ -34,6 +34,7 @@ class _AccountPageState extends State<AccountPage> {
      FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: false);
      if (result != null) {
        setState(() {
+         isPicLoading = true;
          pickedFile = File(result.files.first.path!);
        });
      }
@@ -45,7 +46,9 @@ class _AccountPageState extends State<AccountPage> {
     Directory appDocDir = await getTemporaryDirectory();
     final file = File('${appDocDir.path}/$path');
     await file.writeAsBytes(byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
-    setState(() {pickedFile = file;});
+    setState(() {
+      isPicLoading = true;
+      pickedFile = file;});
    }
 
   @override
@@ -110,14 +113,14 @@ class _AccountPageState extends State<AccountPage> {
                                       () async {
                                     Navigator.pop(context);
                                     await _getImageFileFromDevice();
-                                    setState(() {isPicLoading = true;});
+
                                     if (pickedFile != null) await controller.upLoadFile(File(pickedFile!.path!));
                                     setState(() {isPicLoading = false;});
                                   },
 
+
                                       () async {
                                     Navigator.pop(context);
-                                    setState(() {isPicLoading = true;});
                                     await _getImageFileFromAssets("profile-logo.png");
                                     if (pickedFile != null) await controller.upLoadFile(pickedFile!);
                                     setState(() {isPicLoading = false;});
@@ -170,7 +173,7 @@ class _AccountPageState extends State<AccountPage> {
                   child: AccountTile(
                       iconBgColor: AppColors.yellowColor,
                       icon: Icons.phone,
-                      text: user.phone ?? "Your phone number"
+                      text: auth.currentUser!.phoneNumber ?? "Your phone number"
                   ),
                 ),
 

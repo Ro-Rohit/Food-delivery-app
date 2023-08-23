@@ -52,6 +52,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body:GetBuilder<AuthController>(builder: (authController){
+        bool isLoading = authController.isLoading;
         return  SingleChildScrollView(
           child: Column(
             children: [
@@ -128,9 +129,7 @@ class _LoginPageState extends State<LoginPage> {
 
                     //btn
                     InkWell(
-                      onTap: () {
-                        submitForm();
-                      },
+                      onTap: isLoading ? null :  () {submitForm();},
                       child: Container(
                         padding: EdgeInsets.symmetric(
                             vertical: Dimension.height20,
@@ -141,7 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                           color: AppColors.mainColor,
                         ),
                         child:  Center(
-                            child: authController.isLoading
+                            child: isLoading
                                 ? const CircularProgressIndicator(color: Colors.white,)
                                 : const SmallText(
                               text: "Sign in",

@@ -1,9 +1,6 @@
-import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:yummy/widgets/Big_text.dart';
 import '../../data/controller/auth_controller.dart';
 import '../../utils/dimension.dart';
 import '../../utils/colors.dart';
@@ -12,7 +9,6 @@ import '../../widgets/small_text.dart';
 import '../../widgets/custom_snackbar.dart';
 import '../../Routes/app_routes.dart';
 import 'package:get/get.dart';
-import '../../widgets/text_icon.dart';
 
 
 class RegistrationPage extends StatefulWidget {
@@ -66,6 +62,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: GetBuilder<AuthController>(builder: (authController){
+        bool isLoading = authController.isLoading;
         return SingleChildScrollView(
           child: Column(
             children: [
@@ -127,9 +124,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
                     //btn
                     InkWell(
-                      onTap: () {
-                        submitForm();
-                      },
+                      onTap:isLoading ? null : () {submitForm();},
                       child: Container(
                         padding: EdgeInsets.symmetric(
                             vertical: Dimension.height20,
@@ -140,7 +135,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           color: AppColors.mainColor,
                         ),
                         child:  Center(
-                            child: authController.isLoading
+                            child: isLoading
                                 ? const  CircularProgressIndicator(color: Colors.white,)
                                 : const SmallText(
                               text: "Sign up",
@@ -210,7 +205,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: (){},
+                      onTap: (){
+                        Get.toNamed(AppRoutes.getPhoneSignInPage());
+                      },
                       child: const CircleAvatar(
                         backgroundColor: Colors.transparent,
                         backgroundImage: AssetImage("images/twitter.png"),

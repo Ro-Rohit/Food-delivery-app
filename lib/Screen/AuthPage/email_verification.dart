@@ -46,82 +46,72 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return  Scaffold(
       backgroundColor: Colors.white,
       body:GetBuilder<AuthController>(builder: (authController){
-        // Get.find<AuthController>().resendEmailVerification();
+        bool isLoading = authController.isLoading;
         return  Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding:  EdgeInsets.symmetric(horizontal: Dimension.width20, vertical: Dimension.height20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: Dimension.height45 *2,),
 
-              Align(
-                alignment: Alignment.center,
-                child: Image.asset("images/yummy-ico.png", height: Dimension.height30 *5, width: Dimension.width30*5,),
-              ),
+              Image.asset("images/yummy-ico.png", height: Dimension.height30 *5, width: Dimension.width30*5,),
 
               SizedBox(height: Dimension.height10 ,),
 
-              Container(
-                alignment: Alignment.topLeft,
-                width: Dimension.screenWidth,
-                padding: EdgeInsets.symmetric(horizontal: Dimension.height15),
-                child: Column(
-                  children: [
-                    BigText( text: 'Email', size: Dimension.iconSize24*3, color: AppColors.mainBlackColor,),
-                    SmallText(text: 'Verification', size: 15, color: AppColors.mainBlackColor,)
-                  ],
-                ),
-              ),
+              Align(alignment: Alignment.centerLeft, child: BigText( text: 'Email', size: Dimension.iconSize24*3, color: AppColors.mainBlackColor,)),
+              const Align( alignment: Alignment.centerLeft, child: Padding( padding: EdgeInsets.only(left: 10), child: SmallText(text: 'Verification', size: 15, color: AppColors.mainBlackColor,))),
+
 
               SizedBox(height: Dimension.height45 *2,),
 
-              const Align(
-                alignment: Alignment.center,
-                child: Text("An Email is sent into your account", style: TextStyle(color: AppColors.textColor),),
-              ),
 
-              SizedBox(height: 5,),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.mainColor,
+                      minimumSize: Size(Dimension.screenWidth -Dimension.width45*2, Dimension.height45)
+                  ),
+                  onPressed: isLoading ? null : (){
+                    authController.resendEmailVerification();
+                  },
+                  child: const Text("Resent Email")),
 
-              Align(
-                alignment: Alignment.center,
-                child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.mainColor
-                    ),
-                    onPressed: (){
-                      authController.resendEmailVerification();
-                    },
-                    child: const Text("Resent Email")),
-              ),
+               SizedBox(height: Dimension.height20 *1.3,),
 
-              SizedBox(height: Dimension.height30,),
+              //message
+               Text(isLoading? "" : "An Email has been sent into your account! ",
+                  textAlign: TextAlign.center,
+                  style: const  TextStyle(color: AppColors.textColor,),),
 
+              const Spacer(),
 
-              Align(
-                alignment: Alignment.center,
-                child:RichText(
-                    text: TextSpan(
-                        text: "Don't have an account?",
-                        style: const TextStyle(
-                            color: Colors.black45, fontSize: 16),
-                        children: [
-                          TextSpan(
-                              text: " Create",
-                              style: const TextStyle(
-                                  color: AppColors.mainBlackColor,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  Get.toNamed(AppRoutes.getRegistrationPage());
-                                })
-                        ])),
-
-              ),
-
+              RichText(
+                  text: TextSpan(
+                      text: "Don't have an account?",
+                      style: const TextStyle(
+                          color: Colors.black45, fontSize: 16),
+                      children: [
+                        TextSpan(
+                            text: " Create",
+                            style: const TextStyle(
+                                color: AppColors.mainBlackColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                Get.offNamed(AppRoutes.getRegistrationPage());
+                              })
+                      ])),
             ],
           ),
         );

@@ -59,7 +59,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
   Widget build(BuildContext context) {
     return GetBuilder<AuthController>(builder: (authController){
        if(authController.userData !=null){
-        personNameController.text = authController.userData.name ;
+        personNameController.text = authController.userData.name?? "" ;
         personNumberController.text = authController.userData.phone ?? "";
       }
 

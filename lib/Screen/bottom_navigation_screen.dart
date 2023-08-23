@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yummy/Notification/local_notification.dart';
+import 'package:yummy/Screen/AuthPage/email_verification.dart';
 import 'package:yummy/Screen/home/HomePage.dart';
 import 'package:yummy/utils/colors.dart';
 import '../Notification/cloud_messaging.dart';
@@ -26,7 +27,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
 
   List<Widget> pages = [
     const HomePage(),
-    const LoginPage(),
+    const EmailVerificationPage(),
     const HistoryPage(),
     const AccountPage(),
   ];
@@ -44,7 +45,6 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // Get.find<LocationController>().getCurrentUserLocation();
     Get.find<LockController>().getCurrentUserLocation();
     FireMessage.requestForNotificationPermission();
      FireMessage.onForeGroundNotification(handleMessage);
